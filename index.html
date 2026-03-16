@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#6B3A2A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Mi Agenda 🤎" />
+  <meta name="description" content="Tu agenda de tareas con amor" />
+
+  <!-- PWA Icons for iPhone -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png" />
+  <link rel="apple-touch-startup-image" href="icons/splash.png" />
+
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <title>Mi Agenda 🤎</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Splash / Welcome Screen -->
+  <div id="splash" class="splash">
+    <div class="splash-content">
+      <div class="heart-icon">🤎</div>
+      <h1 class="splash-title">Mi Agenda</h1>
+      <p class="splash-sub">con amor, para ti</p>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="app hidden">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="header-left">
+          <span class="header-heart">🤎</span>
+          <div>
+            <h1 class="header-title">Mi Agenda</h1>
+            <p class="header-date" id="headerDate"></p>
+          </div>
+        </div>
+        <button class="btn-add" id="btnAdd" aria-label="Agregar tarea">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="pendientes">Pendientes</button>
+      <button class="tab" data-tab="hoy">Para Hoy</button>
+      <button class="tab" data-tab="completadas">Completadas</button>
+    </nav>
+
+    <!-- Stats bar -->
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-num" id="statPending">0</span>
+        <span class="stat-label">Pendientes</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num" id="statToday">0</span>
+        <span class="stat-label">Para hoy</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num" id="statDone">0</span>
+        <span class="stat-label">Completadas</span>
+      </div>
+    </div>
+
+    <!-- Task List -->
+    <main class="main-content">
+      <div id="taskList" class="task-list"></div>
+      <div id="emptyState" class="empty-state hidden">
+        <div class="empty-icon">🤎</div>
+        <p class="empty-text">No hay tareas aquí</p>
+        <p class="empty-sub">¡Todo en orden, mi amor!</p>
+      </div>
+    </main>
+
+    <!-- Bottom padding for safe area -->
+    <div class="bottom-safe"></div>
+  </div>
+
+  <!-- MODAL: Add / Edit Task -->
+  <div id="modalOverlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Nueva Tarea</h2>
+        <button class="modal-close" id="modalClose" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label class="label" for="inputMateria">📚 Materia</label>
+          <input class="input" id="inputMateria" type="text" placeholder="Ej: Matemáticas, Historia..." maxlength="50" />
+        </div>
+        <div class="field">
+          <label class="label" for="inputTrabajo">📝 Trabajo / Tarea</label>
+          <textarea class="input textarea" id="inputTrabajo" placeholder="Describe la tarea que dejaron..." maxlength="300" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label class="label" for="inputFecha">📅 Fecha de Entrega</label>
+          <input class="input" id="inputFecha" type="date" />
+        </div>
+        <div class="field">
+          <label class="label" for="inputPrioridad">⚡ Prioridad</label>
+          <div class="priority-options">
+            <label class="priority-opt">
+              <input type="radio" name="prioridad" value="alta" /> <span class="priority-badge alta">Alta</span>
+            </label>
+            <label class="priority-opt">
+              <input type="radio" name="prioridad" value="media" checked /> <span class="priority-badge media">Media</span>
+            </label>
+            <label class="priority-opt">
+              <input type="radio" name="prioridad" value="baja" /> <span class="priority-badge baja">Baja</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btnCancel">Cancelar</button>
+        <button class="btn-save" id="btnSave">Guardar 🤎</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Confirm Delete -->
+  <div id="deleteOverlay" class="modal-overlay hidden">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">¿Eliminar tarea?</h2>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-muted); text-align:center; font-family: var(--font-body);">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="deleteCancelBtn">Cancelar</button>
+        <button class="btn-delete" id="deleteConfirmBtn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden" role="alert"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
